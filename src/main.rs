@@ -7,11 +7,14 @@ use std::time::Duration;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::fs::File;
+use std::env;
 
 use std::time::{SystemTime, UNIX_EPOCH};
 
 
 fn main() {
+
+    let args: Vec<String> = env::args().collect();
  
     // Connect to the session bus
     let connection = Connection::new_session().unwrap();
@@ -20,12 +23,10 @@ fn main() {
     let rule = MatchRule::new();
     let result: Result<(), dbus::Error> =
         proxy.method_call("org.freedesktop.DBus.Monitoring", "BecomeMonitor", (vec![rule.match_str()], 0u32));
- 
-    let mut file = File::create("data.txt");
-    dbg!(file);
- 
-    let mut notifications: Vec<String> = Vec::new();
- 
+
+    
+    let mut file = File::create("logs.txt");
+
     match result {
         Err(e) => {
             eprintln!("Err {:?}", e);
