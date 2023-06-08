@@ -56,9 +56,7 @@ fn handle_message(msg: &Message) {
     if let Some(message) = is_notif(msg) {
         let items = message.get_items();
         let (program, name, summary) = (items.get(0), items.get(3), items.get(4));
-
         let notification = new_notif(program, name, summary);
-        
         let json = format_to_json(notification);
         write_to_file(&json);
     }
@@ -77,15 +75,15 @@ fn is_notif(msg: &Message) -> Option<&Message> {
 }
 
 fn format_to_json(n: Notif) -> String {
-
-    return format!("{{ program: {:?}, name: {:?}, summary: {:?}, timestamp: {:?} }} \n", n.program, n.name, n.body, n.time);
+    return format!("{{ \"program\": {}, \"name\": {}, \"summary\": {}, \"time\": {} }} \n",
+     &n.program[4..n.program.len()-1], &n.name[4..n.name.len()-1], &n.body[4..n.body.len()-1], n.time);
 }
 
 fn write_to_file(text: &str) {
     // Open a file with append option
     let mut data_file = OpenOptions::new()
         .append(true)
-        .open("data.txt")
+        .open("logs.txt")
         .expect("cannot open file");
 
     // Write to a file
@@ -98,13 +96,13 @@ struct Notif {
     program: String,
     name: String,
     body: String,
-    time: SystemTime
+    time: u64
 }
 
 fn new_notif(p: Option<&MessageItem>, n: Option<&MessageItem>, b: Option<&MessageItem>) -> Notif {
     Notif { program: format!("{:?}", p.unwrap()),
         name: format!("{:?}", n.unwrap()),
         body: format!("{:?}", b.unwrap()),
-        time:  SystemTime::now()
+        time:  SystemTime::now().duration_since(UNIX_EPOCH).expect("Cant get time?").as_secs()
         }
 }
