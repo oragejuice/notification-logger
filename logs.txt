@@ -1,1 +1,0 @@
-{ "program": "notify-send", "name": "hello", "summary": "", "time": 1686221869 } 
